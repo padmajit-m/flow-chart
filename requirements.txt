@@ -1,3 +1,2 @@
 streamlit
-pydot
-Pillow
+requests
