@@ -1,92 +1,61 @@
 import streamlit as st
-from graphviz import Digraph
+import pygraphviz as pgv
 from PIL import Image
 import io
 
-def create_loan_origination_flowchart():
-    dot = Digraph(comment='Loan Origination Process')
+def create_flowchart_loan_origination():
+    # Create the graph using AGraph from pygraphviz
+    graph = pgv.AGraph(strict=False, directed=True)
 
-    # Define nodes
-    dot.node('A', 'KYC Verification')
-    dot.node('B', 'Credit Check')
-    dot.node('C', 'Kiscore Check')
-    dot.node('D', 'Assign Area')
-    dot.node('E', 'Group Creation')
-    dot.node('F', 'KYC Capture')
-    dot.node('G', 'KYC Document Verification')
-    dot.node('H', 'KYC Updation')
-    dot.node('I', 'KYC Data Verification')
-    dot.node('J', 'Assign FO for Field Verification')
-    dot.node('K', 'Field Verification')
-    dot.node('L', 'Appraisal')
-    dot.node('M', 'GRT')
-    dot.node('N', 'Authorization')
-    dot.node('O', 'Loan Disbursement')
-    dot.node('P', 'Kaleidofins System')
-    dot.node('Q', 'Kicredit System')
+    # Define nodes and edges
+    graph.add_edge('KYC Verification', 'Credit Check')
+    graph.add_edge('Credit Check', 'Kiscore Check')
+    graph.add_edge('Kiscore Check', 'Assign Area')
+    graph.add_edge('Assign Area', 'Group Creation')
+    graph.add_edge('Group Creation', 'KYC Capture')
+    graph.add_edge('KYC Capture', 'KYC Document Verification')
+    graph.add_edge('KYC Document Verification', 'KYC Updation')
+    graph.add_edge('KYC Updation', 'KYC Data Verification')
+    graph.add_edge('KYC Data Verification', 'Assign FO for Field Verification')
+    graph.add_edge('Assign FO for Field Verification', 'Field Verification')
+    graph.add_edge('Field Verification', 'Appraisal')
+    graph.add_edge('Appraisal', 'GRT')
+    graph.add_edge('GRT', 'Authorization')
+    graph.add_edge('Authorization', 'Loan Disbursement')
+    graph.add_edge('Loan Disbursement', 'Kaleidofins System')
+    graph.add_edge('Kaleidofins System', 'Kicredit System')
 
-    # Define edges
-    dot.edge('A', 'B')
-    dot.edge('B', 'C')
-    dot.edge('C', 'D')
-    dot.edge('D', 'E')
-    dot.edge('E', 'F')
-    dot.edge('F', 'G')
-    dot.edge('G', 'H')
-    dot.edge('H', 'I')
-    dot.edge('I', 'J')
-    dot.edge('J', 'K')
-    dot.edge('K', 'L')
-    dot.edge('L', 'M')
-    dot.edge('M', 'N')
-    dot.edge('N', 'O')
-    dot.edge('O', 'P')
-    dot.edge('P', 'Q')
+    return graph
 
-    return dot
+def create_flowchart_bc_onboarding():
+    # Create the graph using AGraph from pygraphviz
+    graph = pgv.AGraph(strict=False, directed=True)
 
-def create_bc_onboarding_flowchart():
-    dot = Digraph(comment='BC Partner Onboarding Process')
+    # Define nodes and edges
+    graph.add_edge('Login as APEX User', 'Select Admin Management')
+    graph.add_edge('Select Admin Management', 'Select Office Management')
+    graph.add_edge('Select Office Management', 'Manage BC')
+    graph.add_edge('Manage BC', 'Create New BC')
+    graph.add_edge('Create New BC', 'Create Branch Office')
+    graph.add_edge('Create Branch Office', 'Create Product Code')
+    graph.add_edge('Create Product Code', 'Area Creation')
+    graph.add_edge('Area Creation', 'Area Approval')
+    graph.add_edge('Area Approval', 'Create Ledger')
+    graph.add_edge('Create Ledger', 'Assign Ledger')
 
-    # Define nodes
-    dot.node('A', 'Login as APEX User')
-    dot.node('B', 'Select Admin Management')
-    dot.node('C', 'Select Office Management')
-    dot.node('D', 'Manage BC')
-    dot.node('E', 'Create New BC')
-    dot.node('F', 'Create Branch Office')
-    dot.node('G', 'Create Product Code')
-    dot.node('H', 'Area Creation')
-    dot.node('I', 'Area Approval')
-    dot.node('J', 'Create Ledger')
-    dot.node('K', 'Assign Ledger')
+    return graph
 
-    # Define edges
-    dot.edge('A', 'B')
-    dot.edge('B', 'C')
-    dot.edge('C', 'D')
-    dot.edge('D', 'E')
-    dot.edge('E', 'F')
-    dot.edge('F', 'G')
-    dot.edge('G', 'H')
-    dot.edge('H', 'I')
-    dot.edge('I', 'J')
-    dot.edge('J', 'K')
-
-    return dot
+def render_graph(graph):
+    # Render the graph to an in-memory PNG image
+    png_image = graph.draw(format='png', prog='dot')
+    return Image.open(io.BytesIO(png_image))
 
 st.title('Flowchart Generator')
 
 st.header('Loan Origination Process')
-loan_chart = create_loan_origination_flowchart()
-loan_chart_path = '/tmp/loan_origination_flowchart.png'
-loan_chart.render(loan_chart_path, format='png', cleanup=True)
-
-st.image(loan_chart_path, caption='Loan Origination Process')
+loan_chart = create_flowchart_loan_origination()
+st.image(render_graph(loan_chart), caption='Loan Origination Process')
 
 st.header('BC Partner Onboarding Process')
-bc_chart = create_bc_onboarding_flowchart()
-bc_chart_path = '/tmp/bc_onboarding_flowchart.png'
-bc_chart.render(bc_chart_path, format='png', cleanup=True)
-
-st.image(bc_chart_path, caption='BC Partner Onboarding Process')
+bc_chart = create_flowchart_bc_onboarding()
+st.image(render_graph(bc_chart), caption='BC Partner Onboarding Process')
