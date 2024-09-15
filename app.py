@@ -1,53 +1,88 @@
 import streamlit as st
-import pygraphviz as pgv
+import pydot
 from PIL import Image
 import io
 
 def create_flowchart_loan_origination():
-    # Create the graph using AGraph from pygraphviz
-    graph = pgv.AGraph(strict=False, directed=True)
+    # Create the flowchart graph using pydot
+    graph = pydot.Dot(graph_type="digraph", strict=False)
 
     # Define nodes and edges
-    graph.add_edge('KYC Verification', 'Credit Check')
-    graph.add_edge('Credit Check', 'Kiscore Check')
-    graph.add_edge('Kiscore Check', 'Assign Area')
-    graph.add_edge('Assign Area', 'Group Creation')
-    graph.add_edge('Group Creation', 'KYC Capture')
-    graph.add_edge('KYC Capture', 'KYC Document Verification')
-    graph.add_edge('KYC Document Verification', 'KYC Updation')
-    graph.add_edge('KYC Updation', 'KYC Data Verification')
-    graph.add_edge('KYC Data Verification', 'Assign FO for Field Verification')
-    graph.add_edge('Assign FO for Field Verification', 'Field Verification')
-    graph.add_edge('Field Verification', 'Appraisal')
-    graph.add_edge('Appraisal', 'GRT')
-    graph.add_edge('GRT', 'Authorization')
-    graph.add_edge('Authorization', 'Loan Disbursement')
-    graph.add_edge('Loan Disbursement', 'Kaleidofins System')
-    graph.add_edge('Kaleidofins System', 'Kicredit System')
-
+    nodes = [
+        'KYC Verification', 'Credit Check', 'Kiscore Check', 'Assign Area', 'Group Creation',
+        'KYC Capture', 'KYC Document Verification', 'KYC Updation', 'KYC Data Verification',
+        'Assign FO for Field Verification', 'Field Verification', 'Appraisal', 'GRT', 'Authorization',
+        'Loan Disbursement', 'Kaleidofins System', 'Kicredit System'
+    ]
+    
+    # Add nodes to the graph
+    for node in nodes:
+        graph.add_node(pydot.Node(node))
+    
+    # Add edges to the graph
+    edges = [
+        ('KYC Verification', 'Credit Check'),
+        ('Credit Check', 'Kiscore Check'),
+        ('Kiscore Check', 'Assign Area'),
+        ('Assign Area', 'Group Creation'),
+        ('Group Creation', 'KYC Capture'),
+        ('KYC Capture', 'KYC Document Verification'),
+        ('KYC Document Verification', 'KYC Updation'),
+        ('KYC Updation', 'KYC Data Verification'),
+        ('KYC Data Verification', 'Assign FO for Field Verification'),
+        ('Assign FO for Field Verification', 'Field Verification'),
+        ('Field Verification', 'Appraisal'),
+        ('Appraisal', 'GRT'),
+        ('GRT', 'Authorization'),
+        ('Authorization', 'Loan Disbursement'),
+        ('Loan Disbursement', 'Kaleidofins System'),
+        ('Kaleidofins System', 'Kicredit System')
+    ]
+    
+    # Add edges to the graph
+    for edge in edges:
+        graph.add_edge(pydot.Edge(*edge))
+    
     return graph
 
 def create_flowchart_bc_onboarding():
-    # Create the graph using AGraph from pygraphviz
-    graph = pgv.AGraph(strict=False, directed=True)
+    # Create the flowchart graph using pydot
+    graph = pydot.Dot(graph_type="digraph", strict=False)
 
     # Define nodes and edges
-    graph.add_edge('Login as APEX User', 'Select Admin Management')
-    graph.add_edge('Select Admin Management', 'Select Office Management')
-    graph.add_edge('Select Office Management', 'Manage BC')
-    graph.add_edge('Manage BC', 'Create New BC')
-    graph.add_edge('Create New BC', 'Create Branch Office')
-    graph.add_edge('Create Branch Office', 'Create Product Code')
-    graph.add_edge('Create Product Code', 'Area Creation')
-    graph.add_edge('Area Creation', 'Area Approval')
-    graph.add_edge('Area Approval', 'Create Ledger')
-    graph.add_edge('Create Ledger', 'Assign Ledger')
-
+    nodes = [
+        'Login as APEX User', 'Select Admin Management', 'Select Office Management', 'Manage BC',
+        'Create New BC', 'Create Branch Office', 'Create Product Code', 'Area Creation', 'Area Approval',
+        'Create Ledger', 'Assign Ledger'
+    ]
+    
+    # Add nodes to the graph
+    for node in nodes:
+        graph.add_node(pydot.Node(node))
+    
+    # Add edges to the graph
+    edges = [
+        ('Login as APEX User', 'Select Admin Management'),
+        ('Select Admin Management', 'Select Office Management'),
+        ('Select Office Management', 'Manage BC'),
+        ('Manage BC', 'Create New BC'),
+        ('Create New BC', 'Create Branch Office'),
+        ('Create Branch Office', 'Create Product Code'),
+        ('Create Product Code', 'Area Creation'),
+        ('Area Creation', 'Area Approval'),
+        ('Area Approval', 'Create Ledger'),
+        ('Create Ledger', 'Assign Ledger')
+    ]
+    
+    # Add edges to the graph
+    for edge in edges:
+        graph.add_edge(pydot.Edge(*edge))
+    
     return graph
 
 def render_graph(graph):
-    # Render the graph to an in-memory PNG image
-    png_image = graph.draw(format='png', prog='dot')
+    # Render the graph to a PNG image in-memory
+    png_image = graph.create_png()
     return Image.open(io.BytesIO(png_image))
 
 st.title('Flowchart Generator')
